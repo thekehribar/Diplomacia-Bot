@@ -58,6 +58,18 @@ desktop/build/jpackage/DiplomaciaBot/
 7. `DURDUR` ile botu durdur.
 8. Emir kuyrugu ile sirali gelistirme ekle.
 
+## Android Arka Plan Ayarlari
+
+Android, pil tasarrufu nedeniyle arka plandaki uygulamalari geciktirebilir veya durdurabilir. Daha stabil calisma icin:
+
+1. Uygulamada `Arka plan izni ver` butonuna bas.
+2. Acilan ekranda pil optimizasyonunu kapat veya uygulamaya izin ver.
+3. Telefon ayarlarinda `Diplomacia Bot` icin pil kisitlamasini `Kisitlama yok` yap.
+4. Xiaomi, Oppo, Vivo, Huawei gibi cihazlarda ayrica `Otomatik baslatma` izni ver.
+5. Uygulamayi son uygulamalar ekranindan kilitlemek gerekiyorsa kilitle.
+
+Not: Android arka plan sistemi nedeniyle saniyesi saniyesine calisma garanti edilmez. Uygulama WorkManager ile planlama yapar ve cihaz yeniden basladiginda aktif hesaplari tekrar zamanlar.
+
 ## Ozellikler
 
 - Android APK ve Windows/desktop uygulamasi
@@ -166,4 +178,5 @@ Uygulamadaki `Bagis yap` bolumu, gelistiriciye destek olmak icin eklenmistir.
 
 - Tokenler kullanicinin kendi cihazinda veya bilgisayarinda saklanir.
 - Android arka plan zamanlamasi WorkManager ile yapilir; pil optimizasyonlari nedeniyle saniyesi saniyesine calisma garanti edilmez.
+- Arka planda daha stabil calisma icin uygulamadaki `Arka plan izni ver` butonunu kullan.
 - `DiplomaciaBot.apk` debug imzali APK'dir; Android kurulumda bilinmeyen kaynak/debug imza uyarilari normaldir.

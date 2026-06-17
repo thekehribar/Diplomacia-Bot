@@ -6,9 +6,12 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.PowerManager;
+import android.provider.Settings;
 import android.text.InputType;
 import android.view.Gravity;
 import android.widget.ArrayAdapter;
@@ -126,6 +129,8 @@ public class MainActivity extends Activity {
 
         Button connect = actionButton("BAGLAN", ACCENT);
         root.addView(connect, fullButtonParams());
+        Button backgroundPermission = actionButton("Arka plan izni ver", BLUE);
+        root.addView(backgroundPermission, fullButtonParams());
 
         root.addView(sectionTitle("ODEME"));
         LinearLayout paymentRow = row();
@@ -197,6 +202,7 @@ public class MainActivity extends Activity {
         savasButton.setOnClickListener(v -> selectSkill("savas_teknikleri"));
         bilimButton.setOnClickListener(v -> selectSkill("bilim_insani"));
         connect.setOnClickListener(v -> startWebViewLogin());
+        backgroundPermission.setOnClickListener(v -> requestBackgroundPermission());
         save.setOnClickListener(v -> {
             saveConfig(BotConfig.load(this, activeAccount).enabled);
             LogStore.append(this, accountName(activeAccount) + " ayarlari kaydedildi.");
@@ -227,6 +233,24 @@ public class MainActivity extends Activity {
         Intent intent = new Intent(this, LoginWebViewActivity.class);
         intent.putExtra("accountIndex", activeAccount);
         startActivity(intent);
+    }
+
+    private void requestBackgroundPermission() {
+        try {
+            PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+            if (powerManager != null && powerManager.isIgnoringBatteryOptimizations(getPackageName())) {
+                showMessage("Arka plan izni", "Pil optimizasyonu zaten kapali gorunuyor.");
+                return;
+            }
+            Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+            intent.setData(Uri.parse("package:" + getPackageName()));
+            startActivity(intent);
+        } catch (Exception error) {
+            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            intent.setData(Uri.parse("package:" + getPackageName()));
+            startActivity(intent);
+            showMessage("Arka plan izni", "Acilan ekrandan pil optimizasyonunu kapat.");
+        }
     }
 
     private void selectType(String value) {
