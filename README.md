@@ -68,7 +68,9 @@ Android, pil tasarrufu nedeniyle arka plandaki uygulamalari geciktirebilir veya 
 4. Xiaomi, Oppo, Vivo, Huawei gibi cihazlarda ayrica `Otomatik baslatma` izni ver.
 5. Uygulamayi son uygulamalar ekranindan kilitlemek gerekiyorsa kilitle.
 
-Bot baslatildiginda uygulama foreground service olarak kalici bildirimle calisir. Bu, Android'de kesintisize en yakin calisma seklidir. Uygulama ayrica cihaz yeniden basladiginda aktif hesaplari tekrar zamanlar.
+Bot baslatildiginda uygulama foreground service olarak kalici bildirimle calisir. Bu, Android'de kesintisize en yakin calisma seklidir. Uygulama bir sonraki istek zamanini bildigi icin surekli islem yapmak yerine sonraki zamana gore adaptif kontrol yapar.
+
+Pil kullanimi icin uygulama surekli wake lock tutmaz. Wake lock sadece istek tetiklenirken kisa sureli kullanilir. WorkManager yedek planlayici olarak kalir ve cihaz yeniden basladiginda aktif hesaplar tekrar zamanlanir.
 
 Not: Android arka plan sistemi nedeniyle hicbir uygulama icin yuzde yuz kesintisiz calisma garanti edilemez. En iyi sonuc icin pil optimizasyonunu kapat ve kalici bildirimi kapatma.
 
@@ -180,5 +182,5 @@ Uygulamadaki `Bagis yap` bolumu, gelistiriciye destek olmak icin eklenmistir.
 
 - Tokenler kullanicinin kendi cihazinda veya bilgisayarinda saklanir.
 - Android arka plan zamanlamasi WorkManager ile yapilir; pil optimizasyonlari nedeniyle saniyesi saniyesine calisma garanti edilmez.
-- Arka planda daha stabil calisma icin foreground service, WorkManager ve cihaz acilisi sonrasi tekrar zamanlama birlikte kullanilir.
+- Arka planda daha stabil calisma icin foreground service, adaptif zamanlama, kisa sureli wake lock, WorkManager ve cihaz acilisi sonrasi tekrar zamanlama birlikte kullanilir.
 - `DiplomaciaBot.apk` debug imzali APK'dir; Android kurulumda bilinmeyen kaynak/debug imza uyarilari normaldir.

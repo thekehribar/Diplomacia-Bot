@@ -16,13 +16,15 @@ import android.os.PowerManager;
 public class BotForegroundService extends Service {
     private static final String CHANNEL_ID = "diplomacia_bot_foreground";
     private static final int NOTIFICATION_ID = 1001;
+    private static final long MIN_CHECK_MS = 1000L;
+    private static final long MAX_CHECK_MS = 60000L;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private PowerManager.WakeLock wakeLock;
     private final Runnable ticker = new Runnable() {
         @Override
         public void run() {
-            triggerDueRuns();
-            handler.postDelayed(this, 1000L);
+            long nextDelayMs = triggerDueRuns();
+            handler.postDelayed(this, nextDelayMs);
         }
     };
 
@@ -45,11 +47,6 @@ public class BotForegroundService extends Service {
     public void onCreate() {
         super.onCreate();
         createNotificationChannel();
-        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-        if (powerManager != null) {
-            wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "DiplomaciaBot:Foreground");
-            wakeLock.acquire();
-        }
     }
 
     @Override
@@ -74,9 +71,10 @@ public class BotForegroundService extends Service {
         return null;
     }
 
-    private void triggerDueRuns() {
+    private long triggerDueRuns() {
         long now = System.currentTimeMillis();
         boolean hasActive = false;
+        long nearestRunAt = Long.MAX_VALUE;
         for (int i = 0; i < 2; i++) {
             BotConfig config = BotConfig.load(this, i);
             if (!config.isReady()) {
@@ -86,12 +84,34 @@ public class BotForegroundService extends Service {
             long nextRunAt = BotConfig.prefs(this).getLong(BotWorker.nextRunKey(i), 0L);
             if (nextRunAt <= 0L || nextRunAt <= now) {
                 if (!BotWorker.isRunning(i)) {
+                    acquireShortWakeLock();
                     BotWorker.runNow(this, i);
                 }
+            } else {
+                nearestRunAt = Math.min(nearestRunAt, nextRunAt);
             }
         }
         if (!hasActive) {
             stopSelf();
+            return MAX_CHECK_MS;
+        }
+        if (nearestRunAt == Long.MAX_VALUE) {
+            return MAX_CHECK_MS;
+        }
+        long untilNextRun = nearestRunAt - System.currentTimeMillis();
+        return Math.max(MIN_CHECK_MS, Math.min(untilNextRun, MAX_CHECK_MS));
+    }
+
+    private void acquireShortWakeLock() {
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        if (powerManager == null) {
+            return;
+        }
+        if (wakeLock == null) {
+            wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "DiplomaciaBot:Run");
+        }
+        if (!wakeLock.isHeld()) {
+            wakeLock.acquire(30000L);
         }
     }
 
