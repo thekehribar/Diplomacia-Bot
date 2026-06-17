@@ -17,6 +17,7 @@ public class BootReceiver extends BroadcastReceiver {
             if (config.isReady()) {
                 LogStore.append(context, "Hesap " + (i + 1) + " cihaz acilisinda tekrar zamanlandi.");
                 BotWorker.schedule(context, i, TimeUnit.MINUTES.toMillis(1));
+                BotForegroundService.start(context);
             }
         }
     }

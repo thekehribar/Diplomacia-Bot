@@ -2,7 +2,9 @@ package com.diplomacia.bot;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
@@ -72,6 +74,7 @@ public class MainActivity extends Activity {
         buildUi();
         loadConfig();
         refreshStatus();
+        requestNotificationPermission();
     }
 
     @Override
@@ -213,11 +216,13 @@ public class MainActivity extends Activity {
         removeQueue.setOnClickListener(v -> removeFirstQueueEntry());
         start.setOnClickListener(v -> {
             saveConfig(true);
+            BotForegroundService.start(this);
             BotWorker.start(this, activeAccount);
             refreshStatus();
         });
         stop.setOnClickListener(v -> {
             BotWorker.stop(this, activeAccount);
+            BotForegroundService.stopIfNoActiveAccount(this);
             LogStore.append(this, accountName(activeAccount) + " bot durduruldu.");
             refreshStatus();
         });
@@ -251,6 +256,16 @@ public class MainActivity extends Activity {
             startActivity(intent);
             showMessage("Arka plan izni", "Acilan ekrandan pil optimizasyonunu kapat.");
         }
+    }
+
+    private void requestNotificationPermission() {
+        if (android.os.Build.VERSION.SDK_INT < 33) {
+            return;
+        }
+        if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 100);
     }
 
     private void selectType(String value) {
