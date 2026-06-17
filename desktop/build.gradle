@@ -1,0 +1,34 @@
+plugins {
+    id 'application'
+}
+
+dependencies {
+    implementation 'org.json:json:20250517'
+}
+
+application {
+    mainClass = 'com.diplomacia.bot.desktop.DesktopBotApp'
+}
+
+tasks.register('packageExe', Exec) {
+    dependsOn tasks.named('installDist')
+
+    def appName = 'DiplomaciaBot'
+    def outputDir = layout.buildDirectory.dir('jpackage').get().asFile
+    def appDir = new File(outputDir, appName)
+    def inputDir = layout.buildDirectory.dir('install/' + project.name + '/lib').get().asFile
+    def mainJar = project.name + '.jar'
+
+    doFirst {
+        delete appDir
+        outputDir.mkdirs()
+    }
+
+    executable = 'jpackage'
+    args '--type', 'app-image',
+            '--name', appName,
+            '--input', inputDir.absolutePath,
+            '--main-jar', mainJar,
+            '--main-class', application.mainClass.get(),
+            '--dest', outputDir.absolutePath
+}
