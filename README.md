@@ -159,29 +159,11 @@ android-app/
 
 ## Geliştiriciye Bagis
 
-Uygulamadaki `Bagis yap` bolumu, gelistiriciye destek olmak icin eklenmistir. Kullanici miktar girer ve uygulama secili hesapta kayitli token ile sabit gelistirici hesabina transfer istegi gonderir.
+Uygulamadaki `Bagis yap` bolumu, gelistiriciye destek olmak icin eklenmistir. 
 
-Endpoint:
-
-```text
-POST https://diplomacia.com.tr/api/transfer/send
-```
-
-Gonderilen veri:
-
-```json
-{
-  "recipient_id": "ec756c8c-d06a-474f-973e-6fdec9cb58c6",
-  "amount": 5000000
-}
-```
-
-`amount` kullanicinin girdigi miktardir. `recipient_id` gelistirici hesabidir ve uygulama icinde sabittir.
 
 ## Guvenlik ve Notlar
 
-- Repo icinde gomulu kullanici tokeni bulunmaz.
 - Tokenler kullanicinin kendi cihazinda veya bilgisayarinda saklanir.
-- `local.properties`, build ciktilari ve IDE dosyalari repo disinda tutulur.
 - Android arka plan zamanlamasi WorkManager ile yapilir; pil optimizasyonlari nedeniyle saniyesi saniyesine calisma garanti edilmez.
 - `DiplomaciaBot.apk` debug imzali APK'dir; Android kurulumda bilinmeyen kaynak/debug imza uyarilari normaldir.
